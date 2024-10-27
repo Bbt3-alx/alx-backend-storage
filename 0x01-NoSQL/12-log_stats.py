@@ -11,21 +11,24 @@ def log_stats():
     client = MongoClient('mongodb://localhost:27017')
     nginx = client.logs.nginx
 
-    nb_methods = nginx.count_documents({})
-    nb_get = nginx.count_documents({'method': 'GET'})
-    nb_post = nginx.count_documents({'method': 'POST'})
-    nb_put = nginx.count_documents({'method': 'PUT'})
-    nb_patch = nginx.count_documents({'method': 'PATCH'})
-    nb_delete = nginx.count_documents({'method': 'DELETE'})
+    if nginx.count_documents({}) == 0:
+        return
+
+    method_counts = {
+        "GET": nginx.count_documents({'method': 'GET'}),
+        "POST": nginx.count_documents({'method': 'POST'}),
+        "PUT": nginx.count_documents({'method': 'PUT'}),
+        "PATCH": nginx.count_documents({'method': 'PATCH'}),
+        "DELETE": nginx.count_documents({'method': 'DELETE'}),
+    }
+
+    nb_methods = sum(method_counts.values())
     status_check = nginx.count_documents({'path': '/status'})
 
     print(f"{nb_methods} logs")
     print("Methods:")
-    print(f"\tmethod GET: {nb_get}")
-    print(f"\tmethod POST: {nb_post}")
-    print(f"\tmethod PUT: {nb_put}")
-    print(f"\tmethod PATCH: {nb_patch}")
-    print(f"\tmethod DELETE: {nb_delete}")
+    for method, count in method_counts.items():
+        print(f"\tmethod {method}: {count}")
     print(f"{status_check} status check")
 
 
