@@ -13,9 +13,6 @@ def log_stat_top_10():
     client = MongoClient('mongodb://localhost:27017')
     nginx = client.logs.nginx
 
-    if nginx.count_documents({}) == 0:
-        return
-
     method_counts = {
         "GET": nginx.count_documents({'method': 'GET'}),
         "POST": nginx.count_documents({'method': 'POST'}),
